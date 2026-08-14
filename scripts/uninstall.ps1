@@ -17,16 +17,21 @@ if (-not (Test-Path -LiteralPath $DestinationRoot -PathType Container)) {
     return
 }
 
-$destinationFull = (Resolve-Path -LiteralPath $DestinationRoot).Path.TrimEnd('\', '/')
-$expectedPrefix = $destinationFull + [IO.Path]::DirectorySeparatorChar
+$destinationFull = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $DestinationRoot).Path).TrimEnd('\', '/')
+$filesystemRoot = [IO.Path]::GetPathRoot($destinationFull).TrimEnd('\', '/')
+if ([string]::Equals($destinationFull, $filesystemRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to uninstall from a filesystem root: $destinationFull"
+}
 
 foreach ($skillName in $skillNames) {
     $target = [IO.Path]::GetFullPath((Join-Path $destinationFull $skillName))
-    if (-not $target.StartsWith($expectedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-        throw "Resolved target escapes destination root: $target"
-    }
-    if ((Split-Path -Parent $target).TrimEnd('\', '/') -ne $destinationFull) {
+    $targetParent = [IO.Path]::GetFullPath([IO.Path]::GetDirectoryName($target)).TrimEnd('\', '/')
+    $targetName = [IO.Path]::GetFileName($target)
+    if (-not [string]::Equals($targetParent, $destinationFull, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Resolved target is not a direct child of destination root: $target"
+    }
+    if (-not [string]::Equals($targetName, $skillName, [StringComparison]::Ordinal)) {
+        throw "Resolved target name is not an approved skill: $target"
     }
     if ((Test-Path -LiteralPath $target) -and $PSCmdlet.ShouldProcess($target, 'Remove installed skill')) {
         Remove-Item -LiteralPath $target -Recurse -Force

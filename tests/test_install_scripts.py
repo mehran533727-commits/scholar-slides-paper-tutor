@@ -39,6 +39,19 @@ class InstallScriptSafetyTests(unittest.TestCase):
         self.assertIn("paper-tutor", text)
         self.assertNotIn("Remove-Item -LiteralPath $DestinationRoot -Recurse", text)
 
+    def test_uninstaller_refuses_a_filesystem_root_even_with_what_if(self):
+        if not REPOSITORY_ROOT.anchor:
+            self.skipTest("The current platform has no drive root")
+        refused = self.run_script(
+            "uninstall.ps1",
+            "-DestinationRoot",
+            REPOSITORY_ROOT.anchor,
+            "-ConfirmRemoval",
+            "-WhatIf",
+        )
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertIn("filesystem root", refused.stdout + refused.stderr)
+
     def test_copy_only_install_refuses_overwrite_and_force_creates_backup(self):
         with TemporaryDirectory() as tmp:
             destination = Path(tmp) / "skills"
