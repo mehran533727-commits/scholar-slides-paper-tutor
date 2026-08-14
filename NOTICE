@@ -1,0 +1,12 @@
+Scholar-Slides + Paper-Tutor skill bundle
+
+Scholar-Slides 0.3.0 is included under its existing MIT License.
+Copyright (c) 2026 louwill.
+See skills/scholar-slides/LICENSE.
+
+Paper-Tutor was supplied as a separate local Codex skill without a license file.
+No license for Paper-Tutor is inferred by this bundle.
+
+Repository-level installation, validation, CI, and integration documentation
+were added to package the two skills reproducibly while preserving their
+one-way evidence boundary and explicit human checkpoint requirements.
