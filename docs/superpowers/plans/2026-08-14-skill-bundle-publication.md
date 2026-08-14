@@ -74,7 +74,7 @@ class PackageValidationTests(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             file = root / "README.md"
-            file.write_text(r"C:\Users\16595\secret.pdf", encoding="utf-8")
+            file.write_text(r"C:\Users\example-user\secret.pdf", encoding="utf-8")
             errors = validate_repository(root)
             self.assertTrue(any("absolute path" in error for error in errors))
 
@@ -136,7 +136,7 @@ git commit -m "test: define skill bundle packaging contracts"
 - Create: `.gitattributes`
 
 **Interfaces:**
-- Consumes: installed sources at `C:/Users/16595/.agents/skills/scholar-slides` and `C:/Users/16595/.codex/skills/paper-tutor`.
+- Consumes: the installed `scholar-slides` and `paper-tutor` source directories under the current user's skill roots.
 - Produces: source-only directories consumed by installer, validator, docs, and CI.
 
 - [ ] **Step 1: Copy Scholar-Slides maintained files**

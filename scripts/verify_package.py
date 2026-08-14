@@ -62,8 +62,8 @@ FULL_REQUIRED_PATHS = (
 )
 
 SENSITIVE_PATH_PATTERNS = (
-    re.compile(r"[A-Za-z]:[\\/](?:Users[\\/]16595|Desktop[\\/]论文)(?:[\\/]|$)", re.I),
-    re.compile(r"/(?:Users|home)/16595(?:/|$)", re.I),
+    re.compile(r"[A-Za-z]:[\\/]Users[\\/][A-Za-z0-9._-]+(?:[\\/]|$)", re.I),
+    re.compile(r"/(?:Users|home)/[A-Za-z0-9._-]+(?:/|$)", re.I),
 )
 SECRET_PATTERNS = (
     re.compile(r"\bgh[opsu]_[A-Za-z0-9]{20,}\b"),

@@ -26,7 +26,7 @@ class PackageValidationTests(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             file = root / "README.md"
-            private_path = "C:" + "\\Users\\16595\\secret.pdf"
+            private_path = "C:" + "\\Users\\example-user\\secret.pdf"
             file.write_text(private_path, encoding="utf-8")
             errors = validate_repository(root)
             self.assertTrue(any("absolute path" in error for error in errors))
