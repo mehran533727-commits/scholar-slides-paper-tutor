@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "paper_metadata": {
+      "type": "object",
+      "properties": {
+        "evidence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "status": {"enum": ["EXTRACTED", "NEEDS_REVIEW", "HUMAN_CONFIRMED", "MISSING", "UNVERIFIED", "VERIFIED"]}
+            }
+          }
+        }
+      }
+    },
+    "flags": {"type": "array"}
+  }
+}

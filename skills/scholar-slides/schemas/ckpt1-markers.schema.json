@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex.openai.com/schemas/scholar-slides/ckpt1-markers.schema.json",
+  "title": "Scholar Slides CKPT-1 Marker Ledger",
+  "type": "object",
+  "required": ["schema_version", "kind", "source_digest_sha256", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "scholar-slides-ckpt1-markers"},
+    "source_digest_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "items": {"type": "array", "items": {"$ref": "#/$defs/item"}}
+  },
+  "$defs": {
+    "auditRef": {"type": "object", "required": ["path", "sha256"], "additionalProperties": false, "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"}}},
+    "item": {
+      "type": "object", "required": ["marker", "source_pointer", "classification", "resolution", "reason"], "additionalProperties": false,
+      "properties": {
+        "marker": {"type": "string", "minLength": 1}, "source_pointer": {"type": "string", "pattern": "^/"},
+        "classification": {"enum": ["critical", "noncritical"]}, "resolution": {"enum": ["unresolved", "resolved_with_audit", "excluded_from_deck"]}, "asset_id": {"type": "string", "minLength": 1},
+        "audit_ref": {"anyOf": [{"$ref": "#/$defs/auditRef"}, {"type": "null"}]}, "reason": {"type": "string", "minLength": 1}
+      },
+      "allOf": [{"if": {"properties": {"resolution": {"const": "resolved_with_audit"}}}, "then": {"required": ["audit_ref"], "properties": {"audit_ref": {"$ref": "#/$defs/auditRef"}}}}]
+    }
+  }
+}

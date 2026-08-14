@@ -1,0 +1,215 @@
+/* base-theme.css — shared structural component styles for every scholar-slides theme.
+   Nature/Science figure-editor register: one accent, modular scale (tokens.css), 8pt grid,
+   figures matted consistently, no collisions. Theme "flavor" (title typeface, section-divider
+   colors, scale bumps) lives in the thin flavor files (journal-club.css, conference.css) via the
+   --title-font / --marker-font / --divider-* hooks defined in tokens.css. Palette is in tokens.css.
+   Load order: tokens.css -> viewport-base.css -> base-theme.css -> <flavor>.css. */
+
+.reveal { font-family: var(--sans); color: var(--ink); background: var(--paper); }
+.reveal .slides > section { background: var(--paper); }
+.slide-inner { background: var(--paper); }
+
+/* ---- action title: a full-sentence assertion, not a label ---- */
+.s-title-bar { flex: 0 0 auto; margin-bottom: var(--s4); }
+.s-action-title {
+  font-family: var(--title-font);
+  font-weight: 600;
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track-display);
+  color: var(--title-ink);            /* conference-report register: accent by default (token hook) */
+  text-wrap: balance;                 /* balanced lines, no mid-phrase breaks (full measure) */
+  padding-bottom: var(--s2);
+  border-bottom: var(--rule-weight) solid var(--accent);
+}
+/* A titleless slide (e.g. a references page) must not draw an orphan accent rule. */
+.s-action-title:empty { display: none; }
+.s-title-bar:not(:has(.s-eyebrow)):has(> .s-action-title:empty) { display: none; }
+/* eyebrow as a filled chip (conference-report register) — reads as a section label, not stray text */
+.s-eyebrow {
+  display: inline-block;
+  font-family: var(--sans); font-weight: 700; font-size: 22px;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--paper); background: var(--accent);
+  padding: var(--s1) var(--s3); border-radius: 5px;
+  margin-bottom: var(--s3);
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+
+/* ---- inline semantic emphasis (see emphasis.mjs; QA enforces <=2 roles per slide) ---- */
+/* Emphasis is a BODY device. Inside an action title (already accent ink) the roles rendered
+   invisibly (key) or inconsistently (pos/warn) — so titles neutralize all four on purpose. */
+.reveal .s-action-title .key, .reveal .s-action-title .pos,
+.reveal .s-action-title .warn, .reveal .s-action-title .metric {
+  color: inherit; font-weight: inherit;
+}
+.reveal .key    { color: var(--emph-key);  font-weight: 600; }
+.reveal .pos    { color: var(--emph-pos);  font-weight: 600; }
+.reveal .warn   { color: var(--emph-warn); font-weight: 600; }
+/* metric = weight-only emphasis (no highlighter): numbers read heavier, add zero color */
+.reveal .metric { font-weight: 700; font-variant-numeric: tabular-nums; }
+/* opt-in: a headline finding lifted into a tinted callout row (conference-report register) */
+.reveal .callout {
+  display: block; background: var(--accent-soft);
+  border-left: 5px solid var(--accent); border-radius: 0 var(--fig-radius) var(--fig-radius) 0;
+  padding: var(--s2) var(--s4); list-style: none;
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+/* Content hangs from the header (editorial top-anchor) — vertical centering created a dead band
+   under the title on every text-light slide. Layouts that center on purpose (.s-ae, .s-equation,
+   .s-paper-title, .s-section, .s-results, .s-references, .s-critique) override this locally. */
+.s-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; padding-top: var(--s2); }
+/* Lists own their spacing on the 8pt grid — the UA's 1em block margins would stack an extra
+   dead band between the title rule and the first item. */
+.s-body ul, .s-body ol { margin-block: 0; }
+.s-source { flex: 0 0 auto; margin-top: var(--s3); font-size: var(--fs-fine); color: var(--ink-soft); }
+.s-source .cite { font-variant-numeric: tabular-nums; }
+.s-source .provenance-entry { white-space: nowrap; }
+.s-source .provenance-label { color: var(--accent); font-weight: 650; }
+
+/* ---- paper-title / cover: composed, uses the canvas ---- */
+.s-paper-title { justify-content: center; align-items: flex-start; }
+.s-paper-title h1 {
+  font-family: var(--title-font); font-size: var(--fs-title); line-height: var(--lh-tight);
+  font-weight: 600; max-width: 26ch; text-wrap: balance; letter-spacing: var(--track-display);
+}
+.s-paper-title h1::before {           /* editorial accent bar anchors the cover */
+  content: ""; display: block; width: var(--s7); height: var(--rule-weight);
+  background: var(--accent); margin-bottom: var(--s5);
+}
+.s-paper-title .authors { font-size: var(--fs-lead); margin-top: var(--s5); color: var(--ink); }
+.s-paper-title .affil { font-size: var(--fs-small); color: var(--ink-soft); margin-top: var(--s1); }
+.s-paper-title .venue { font-size: var(--fs-small); color: var(--accent); margin-top: var(--s4); font-weight: 600; }
+.s-paper-title .presenter { font-size: var(--fs-caption); color: var(--ink-soft); margin-top: var(--s5); }
+.s-paper-title .s-title-hero { width: min(100%, 520px); margin-top: var(--s5); }
+.s-paper-title .s-title-hero .s-figure img { height: 360px; }
+
+/* ---- section divider (colors via flavor hooks: journal-club = light, conference = full-bleed dark) ---- */
+.s-section { justify-content: center; align-items: flex-start; background: var(--divider-bg); color: var(--divider-ink); print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+.s-section .num { font-family: var(--title-font); font-size: var(--fs-lead); color: var(--divider-num); }
+.s-section h2 { font-family: var(--title-font); font-size: var(--fs-display); font-weight: 600; max-width: 26ch; text-wrap: balance; color: var(--divider-ink); letter-spacing: var(--track-display); }
+
+/* ---- agenda ---- */
+.s-agenda ol { list-style: none; counter-reset: a; padding: 0; }
+.s-agenda li { counter-increment: a; font-size: var(--fs-lead); padding: var(--s2) 0; border-bottom: var(--hair-weight) solid var(--rule); display: flex; gap: var(--s4); }
+.s-agenda li::before { content: counter(a, decimal-leading-zero); font-family: var(--marker-font); color: var(--accent); font-weight: 700; min-width: 56px; }
+.s-agenda li.cur { color: var(--accent); }
+
+/* ---- unified figure matting (every crop framed the same way, deck-wide) ----
+   Fixed 1920x1080 stage, so figures use px height caps (deterministic) with min-height:0 so they
+   shrink rather than overflow when a slide is tight. --fig-cap / --fig-cap-ae are flavor hooks. */
+.s-figure { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 0; max-width: 100%; }
+.s-figure img {
+  /* Explicit target HEIGHT, not just a cap: a small or DPI-stamped crop must still be shown at
+     protagonist size — the layout decides display size, the source only supplies pixels.
+     object-fit keeps aspect; max-width letterboxes very wide figures inside the mat. */
+  height: var(--fig-cap, 640px); min-height: 0; max-width: 100%; object-fit: contain;
+  background: var(--fig-mat); padding: var(--fig-pad);
+  border: var(--fig-hair); border-radius: var(--fig-radius); box-shadow: var(--fig-shadow);
+}
+.s-figure figcaption { flex: 0 0 auto; margin-top: var(--s1); font-size: var(--fs-caption); color: var(--ink-soft); text-align: center; max-width: 80ch; }  /* wider than body measure: captions should stay ONE line */
+.s-figure figcaption .cite { color: var(--accent); white-space: nowrap; }
+
+/* ---- assertion-evidence: figure is the protagonist; figure flexes, annotation is a fixed row
+   BELOW it — overlap is structurally impossible (annotation is a normal flow sibling, not floated) ---- */
+/* Figure slides: every spare vertical px goes to the figure (protagonist), so the title bar
+   hands over part of its stand-off and the centered body drops the top pad. */
+.s-ae .s-title-bar { margin-bottom: var(--s3); }
+.s-ae .s-body { align-items: center; justify-content: center; gap: var(--s2); padding-top: 0; }
+.s-ae .s-figure { flex: 1 1 auto; }
+.s-ae .s-figure img { height: var(--fig-cap-ae, 560px); }   /* leave room for caption + annotation */
+/* hero mode (figure.hero): the caption folds into the source footer and annotations are banned
+   (validateSpec) — the reclaimed vertical budget goes straight to the image, and the
+   remaining chrome tightens to its minimum stand-off. */
+.s-ae--hero .s-figure img { height: var(--fig-cap-hero, 700px); min-height: 540px; }
+.s-ae--hero .s-title-bar { margin-bottom: var(--s2); }
+.s-ae--hero .s-body { gap: var(--s1); }
+.s-ae--hero .s-figure { width: 100%; align-self: stretch; }
+/* Banner crops (aspect >= 2.2, probed at build → class "wide" + --fig-ar): the height-driven
+   default starves them, so size by the width budget instead; the min() keeps normal caps binding. */
+.s-figure img.wide { height: min(var(--fig-cap, 640px), calc(var(--fig-wide-w, 1382px) / var(--fig-ar, 2.2))); }
+.s-ae .s-figure img.wide { height: min(var(--fig-cap-ae, 620px), calc(var(--fig-wide-w, 1382px) / var(--fig-ar, 2.2))); }
+.s-ae--hero .s-figure img.wide { height: min(var(--fig-cap-hero, 700px), calc(var(--fig-wide-w, 1382px) / var(--fig-ar, 2.2))); }
+.s-annotation {
+  flex: 0 0 auto; font-size: var(--fs-small); line-height: var(--lh-snug); color: var(--ink);
+  background: var(--accent-soft); border-left: 5px solid var(--accent);
+  padding: var(--s2) var(--s4); border-radius: 0 var(--fig-radius) var(--fig-radius) 0; max-width: var(--measure);
+  print-color-adjust: exact; -webkit-print-color-adjust: exact;
+}
+
+/* ---- equation ---- */
+.s-equation .s-body { align-items: center; justify-content: center; gap: var(--s4); }
+.s-equation .eq { font-size: 44px; }
+.s-equation .eq-num { color: var(--ink-soft); font-size: var(--fs-small); }
+.s-equation .note { font-size: var(--fs-small); color: var(--ink-soft); max-width: var(--measure); text-align: center; }
+
+/* ---- results table (real data, never a picture) ----
+   The table centers in the body band (a top-hung table left a 400px void under it), and a
+   small table (rows<=6 AND cols<=5, classed by the renderer) gets the roomier type ramp. */
+.s-results .s-body { justify-content: center; }
+table.results { border-collapse: collapse; font-size: var(--fs-small); font-variant-numeric: tabular-nums; margin: 0 auto; }
+table.results.roomy { font-size: 30px; }
+table.results caption { caption-side: top; font-size: var(--fs-caption); color: var(--ink-soft); text-align: left; margin-bottom: var(--s2); }
+table.results th, table.results td { padding: var(--s1) var(--s3); text-align: right; }
+table.results thead th { border-bottom: 2px solid var(--ink); font-weight: 700; }
+table.results thead th .u { display: block; font-weight: 400; font-size: var(--fs-fine); color: var(--ink-soft); }
+table.results tbody th { text-align: left; font-weight: 600; }
+table.results tbody tr + tr td, table.results tbody tr + tr th { border-top: var(--hair-weight) solid var(--rule); }
+table.results td strong { color: var(--accent); }
+table.results tfoot td { border-top: 2px solid var(--ink); font-size: var(--fs-fine); color: var(--ink-soft); text-align: left; padding-top: var(--s1); }
+/* Wide/long native tables remain editable, but must not turn into an off-canvas
+   poster. Keep values on one line, use a compact type ramp, and reserve the
+   footnote for concise context such as units, trials, and markers. */
+table.results.dense { font-size: 18px; line-height: 1.08; white-space: nowrap; }
+table.results.dense th, table.results.dense td { padding: 4px 6px; }
+table.results.dense caption { font-size: 20px; margin-bottom: 8px; }
+table.results.dense tfoot td { font-size: 16px; white-space: normal; line-height: 1.2; }
+
+/* ---- two-column (method / qualitative) ---- */
+.s-two-col .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); align-items: center; height: 100%; }
+.s-two-col .col-text { font-size: 30px; line-height: var(--lh-snug); max-width: var(--measure); }
+.s-two-col .col-text li { margin: var(--s2) 0; }
+.s-two-col .col-fig .s-figure { max-height: 100%; }
+
+/* ---- evidence flow: native method/process fallback ---- */
+.s-evidence-flow .s-body { align-items: center; justify-content: center; }
+.evidence-flow { display: flex; align-items: center; justify-content: center; gap: var(--s3); width: 100%; min-width: 0; }
+.evidence-node { box-sizing: border-box; flex: 1 1 0; min-width: 0; max-width: 42%; padding: var(--s4); border: var(--rule-weight) solid var(--accent); border-radius: var(--fig-radius); background: var(--accent-soft); font-size: var(--fs-lead); line-height: var(--lh-snug); overflow-wrap: anywhere; }
+.evidence-arrow { flex: 0 0 auto; color: var(--accent); font-size: var(--fs-display); font-family: var(--title-font); }
+.s-evidence-flow .s-body:has(.evidence-flow--stacked) { justify-content: flex-start; }
+.evidence-flow--stacked { flex-direction: column; align-items: stretch; height: 100%; min-height: 0; gap: var(--s1); }
+.evidence-flow--stacked .evidence-node { flex: 0 1 auto; width: 100%; max-width: none; padding: var(--s2) var(--s4); font-size: var(--fs-small); }
+.evidence-flow--stacked .evidence-arrow { align-self: center; font-size: var(--fs-caption); line-height: 1; transform: rotate(90deg); }
+.s-two-col .col-fig .s-figure img { height: auto; max-height: 720px; }  /* grid cell governs; no forced height */
+
+/* ---- critique / concerns (required for journal club) ----
+   Full-canvas 2-column grid: a single measure-capped column left half the stage empty
+   (horizontal void) and ran the last stanza into the footer. align-content centers the
+   rows in the body band, so short lists don't hang from the title either. */
+.s-critique .s-body { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s6); row-gap: var(--s4); align-content: center; }
+.s-critique .pt { padding: var(--s2) 0; border-bottom: var(--hair-weight) solid var(--rule); }
+.s-critique .pt .head { font-size: 32px; font-weight: 700; color: var(--accent); }
+.s-critique .pt .body { font-size: var(--fs-small); color: var(--ink); margin-top: var(--s1); line-height: var(--lh-snug); }
+
+/* ---- discussion questions (required for journal club) ---- */
+.s-discussion ul { list-style: none; padding: 0; }
+.s-discussion li { font-size: var(--fs-lead); line-height: var(--lh-snug); padding: var(--s3) 0; padding-left: 56px; position: relative; max-width: var(--measure); }
+.s-discussion li::before { content: "?"; position: absolute; left: 0; font-family: var(--marker-font);
+  font-weight: 700; color: var(--accent); }
+
+/* ---- generic bullets ---- */
+.s-bullets ul { font-size: 32px; line-height: var(--lh-body); padding-left: var(--s5); max-width: var(--measure); }
+.s-bullets li { margin: var(--s2) 0; }
+
+/* ---- references ----
+   Vertically centered (a short list top-left in an empty canvas reads abandoned, not
+   restrained). Bottom-only li margins keep the two column tops on the same baseline;
+   ol.single (< 4 entries, set by the renderer) drops to one column. */
+.s-references .s-body { justify-content: center; }
+.s-references ol { font-size: 22px; line-height: var(--lh-body); columns: 2; column-gap: var(--s6); padding-left: var(--s4); }
+.s-references ol.single { columns: 1; max-width: 62%; }
+.s-references li { margin: 0 0 var(--s2); break-inside: avoid; }
+.s-references .flag { color: var(--c2); font-weight: 700; }
+
+/* integrity flags rendered inline must be visible, never hidden */
+.flag-missing, .flag-unverified { color: var(--c2); font-weight: 700; }

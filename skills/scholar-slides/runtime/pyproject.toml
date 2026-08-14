@@ -1,0 +1,24 @@
+[project]
+name = "codex-scholar-slides"
+version = "0.3.0"
+description = "Codex academic slide-deck skill — fidelity-first paper-to-slides"
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+scholar-slides = "scholar_slides:main"
+
+[tool.setuptools]
+py-modules = ["asset_graph", "checkpoint", "ckpt1_readiness", "ckpt1_review", "ckpt1_review_markdown", "content_policy", "deck_types", "evidence_audit", "marker_policy", "paper_metadata", "paper_semantics", "prepare_checkpoint", "project_config", "schema_validation", "scholar_slides", "semantic_evidence", "user_documents"]
+package-dir = {"" = "scripts"}
+
+[tool.pytest.ini_options]
+pythonpath = ["scripts"]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "integration: tests that require the real test PDF (tests/fixtures/attention.pdf)",
+]

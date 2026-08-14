@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex.openai.com/schemas/scholar-slides/evidence-audit.schema.json",
+  "$comment": "Validate with schema_validation.create_schema_validator; x-normalized-page-bbox is a Scholar Slides cross-field extension.",
+  "title": "Scholar Slides Evidence Audit Candidate",
+  "type": "object",
+  "required": ["schema_version", "kind", "asset_id", "source", "crop", "reviewed_cells", "prepared_by", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1}, "kind": {"const": "scholar-slides-evidence-audit"}, "asset_id": {"type": "string", "minLength": 1},
+    "evidence_type": {"enum": ["table", "non_table"]}, "confidence": {"enum": ["high", "medium", "low"]},
+    "source": {"$ref": "#/$defs/source"}, "crop": {"$ref": "#/$defs/crop"},
+    "reviewed_cells": {"type": "array", "items": {"$ref": "#/$defs/reviewedCell"}},
+    "prepared_by": {"$ref": "#/$defs/preparedBy"}, "status": {"const": "pending_human_confirmation"}
+  },
+  "allOf": [
+    {"if": {"required": ["evidence_type"], "properties": {"evidence_type": {"const": "non_table"}}}, "else": {"properties": {"reviewed_cells": {"minItems": 1}}}}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "source": {"type": "object", "required": ["pdf_sha256", "page", "locator", "bbox"], "additionalProperties": false, "properties": {"pdf_sha256": {"$ref": "#/$defs/sha256"}, "page": {"type": "integer", "minimum": 1}, "locator": {"type": "string", "minLength": 1}, "bbox": {"type": "object", "required": ["x", "y", "width", "height"], "additionalProperties": false, "x-normalized-page-bbox": true, "properties": {"x": {"type": "number", "minimum": 0, "maximum": 1}, "y": {"type": "number", "minimum": 0, "maximum": 1}, "width": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}, "height": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}}}}},
+    "crop": {"type": "object", "required": ["path", "sha256", "rendering"], "additionalProperties": false, "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "rendering": {"$ref": "#/$defs/rendering"}}},
+    "rendering": {"type": "object", "required": ["renderer", "renderer_version", "dpi"], "additionalProperties": false, "properties": {"renderer": {"const": "pymupdf"}, "renderer_version": {"type": "string", "minLength": 1}, "dpi": {"type": "integer", "minimum": 1}}},
+    "reviewedCell": {"type": "object", "required": ["row_key", "column_key", "value", "normalized_value", "evidence_note"], "additionalProperties": false, "properties": {"row_key": {"type": "string", "minLength": 1}, "column_key": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number"]}, "normalized_value": {"type": ["string", "number"]}, "evidence_note": {"type": "string", "minLength": 1}}},
+    "preparedBy": {"type": "object", "required": ["kind", "name"], "additionalProperties": false, "properties": {"kind": {"const": "agent"}, "name": {"type": "string", "minLength": 1}}}
+  }
+}

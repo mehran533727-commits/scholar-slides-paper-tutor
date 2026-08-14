@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex.openai.com/schemas/scholar-slides/ckpt1-review.schema.json",
+  "title": "Scholar Slides CKPT-1 Review Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "kind", "status", "source_digest", "prepared_by", "prepared_at",
+    "metadata_corrections", "proposed_claims", "proposed_contributions",
+    "proposed_experimental_results", "proposed_key_metrics", "evidence_audits",
+    "marker_resolutions", "unresolved_markers", "deck_forbidden_assets"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "scholar-slides-ckpt1-review"},
+    "status": {"const": "pending_human_confirmation"},
+    "source_digest": {"$ref": "#/$defs/artifactRef"},
+    "prepared_by": {"$ref": "#/$defs/preparedBy"},
+    "prepared_at": {"type": "string", "format": "date-time"},
+    "metadata_corrections": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/metadataCorrection"}
+    },
+    "proposed_claims": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "proposed_contributions": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "proposed_experimental_results": {"type": "array", "items": {"$ref": "#/$defs/evidenceItem"}},
+    "proposed_key_metrics": {"type": "array", "items": {"$ref": "#/$defs/metric"}},
+    "evidence_audits": {"type": "array", "items": {"$ref": "#/$defs/artifactRef"}},
+    "marker_resolutions": {"type": "array", "items": {"$ref": "#/$defs/markerResolution"}},
+    "unresolved_markers": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "deck_forbidden_assets": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "paper_semantics": {"$ref": "#/$defs/paperSemantics"},
+    "mode_b_narrative_readiness": {"$ref": "#/$defs/modeBNarrativeReadiness"},
+    "semantic_corrections": {"type": "array", "items": {"$ref": "#/$defs/semanticCorrection"}},
+    "reviewed_paper_semantics": {"$ref": "#/$defs/paperSemantics"},
+    "semantic_review_provenance": {"$ref": "#/$defs/semanticReviewProvenance"}
+  },
+  "allOf": [
+    {"not": {"anyOf": [
+      {"required": ["approved"]}, {"required": ["confirmed"]}, {"required": ["reviewed_by"]},
+      {"required": ["approved_by"]}, {"required": ["confirmed_by"]}
+    ]}}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "artifactRef": {
+      "type": "object", "required": ["path", "sha256"], "additionalProperties": false,
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "preparedBy": {
+      "type": "object", "required": ["kind", "name"], "additionalProperties": false,
+      "properties": {"kind": {"const": "agent"}, "name": {"type": "string", "minLength": 1}}
+    },
+    "evidence": {
+      "type": "object", "required": ["page", "locator"], "additionalProperties": true,
+      "properties": {"page": {"type": "integer", "minimum": 1}, "locator": {"type": "string", "minLength": 1}}
+    },
+    "metadataCorrection": {
+      "type": "object", "required": ["original", "proposed", "evidence", "reason", "confidence"], "additionalProperties": false,
+      "properties": {
+        "original": {"type": ["string", "number", "array", "object"]}, "proposed": {"type": ["string", "number", "array", "object"]},
+        "evidence": {"$ref": "#/$defs/evidence"}, "reason": {"type": "string", "minLength": 1},
+        "confidence": {"enum": ["high", "medium", "low"]}
+      }
+    },
+    "evidenceItem": {
+      "type": "object", "required": ["text", "evidence", "confidence"], "additionalProperties": true,
+      "properties": {"text": {"type": "string", "minLength": 1}, "evidence": {"$ref": "#/$defs/evidence"}, "confidence": {"enum": ["high", "medium", "low"]}, "audit_ref": {"$ref": "#/$defs/artifactRef"}}
+    },
+    "metric": {
+      "type": "object", "required": ["label", "value", "confidence", "evidence"], "additionalProperties": true,
+      "properties": {
+        "label": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number"]},
+        "confidence": {"enum": ["high", "medium", "low"]}, "evidence": {"$ref": "#/$defs/evidence"}, "audit_ref": {"$ref": "#/$defs/artifactRef"}
+      },
+      "allOf": [{"if": {"properties": {"confidence": {"const": "low"}}}, "then": {"required": ["audit_ref"]}}]
+    },
+    "semanticRecord": {
+      "type": "object",
+      "required": ["text", "summary", "semantic_evidence_type", "source_page", "section", "locator", "confidence"],
+      "additionalProperties": true,
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1},
+        "semantic_evidence_type": {"type": "string", "minLength": 1},
+        "source_page": {"type": "integer", "minimum": 1},
+        "section": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "confidence": {"enum": ["high", "medium", "low"]},
+        "score": {"type": "integer"}
+      }
+    },
+    "semanticSourceRef": {
+      "type": "object",
+      "required": ["source_page", "section", "locator"],
+      "additionalProperties": false,
+      "properties": {
+        "source_page": {"type": "integer", "minimum": 1},
+        "section": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "source_text": {"type": "string", "minLength": 1},
+        "span_identity": {"type": ["string", "object"]}
+      },
+      "anyOf": [{"required": ["source_text"]}, {"required": ["span_identity"]}]
+    },
+    "semanticCorrection": {
+      "type": "object",
+      "required": ["slot", "operation", "reviewed_summary", "semantic_evidence_type", "source_refs", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "slot": {"enum": ["context", "objective_or_research_question", "motivation_or_gap", "problem_setup", "approach", "contributions", "experimental_setup", "main_results", "limitations_or_failure_modes"]},
+        "operation": {"enum": ["replace_slot", "merge_evidence", "add_supporting_evidence", "remove_incorrect_support"]},
+        "reviewed_summary": {"type": "string"},
+        "semantic_evidence_type": {"type": "string", "minLength": 1},
+        "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/semanticSourceRef"}},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "semanticReviewProvenance": {
+      "type": "object",
+      "required": ["extracted_semantics_sha256", "semantic_corrections_sha256", "reviewed_semantics_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_semantics_sha256": {"$ref": "#/$defs/sha256"},
+        "semantic_corrections_sha256": {"$ref": "#/$defs/sha256"},
+        "reviewed_semantics_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "paperSemantics": {
+      "type": "object",
+      "required": ["schema_version", "slots"],
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": {"const": 1},
+        "slots": {
+          "type": "object",
+          "required": ["context", "objective_or_research_question", "motivation_or_gap", "problem_setup", "approach", "contributions", "experimental_setup", "main_results", "limitations_or_failure_modes"],
+          "additionalProperties": false,
+          "properties": {
+            "context": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "objective_or_research_question": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "motivation_or_gap": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "problem_setup": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "approach": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "contributions": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "experimental_setup": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "main_results": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]},
+            "limitations_or_failure_modes": {"anyOf": [{"$ref": "#/$defs/semanticRecord"}, {"type": "null"}]}
+          }
+        },
+        "selection_audit": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "modeBNarrativeReadiness": {
+      "type": "object",
+      "required": ["status", "ready", "required_slots", "missing_slots"],
+      "additionalProperties": true,
+      "properties": {
+        "status": {"enum": ["ready", "incomplete"]},
+        "ready": {"type": "boolean"},
+        "required_slots": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "missing_slots": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "satisfied_slots": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "markerResolution": {
+      "type": "object", "required": ["marker", "resolution", "reason"], "additionalProperties": true,
+      "properties": {"marker": {"type": "string", "minLength": 1}, "resolution": {"enum": ["unresolved", "resolved_with_audit", "excluded_from_deck"]}, "audit_ref": {"$ref": "#/$defs/artifactRef"}, "reason": {"type": "string", "minLength": 1}},
+      "allOf": [{"if": {"properties": {"resolution": {"const": "resolved_with_audit"}}}, "then": {"required": ["audit_ref"]}}]
+    }
+  }
+}

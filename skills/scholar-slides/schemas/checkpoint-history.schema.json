@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex.openai.com/schemas/scholar-slides/checkpoint-history.schema.json",
+  "title": "Scholar Slides Checkpoint History Revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "checkpoint",
+    "revision_id",
+    "archived_at",
+    "archived_by",
+    "reason",
+    "source_checkpoint_sha256",
+    "source_deck_sha256",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "scholar-slides-checkpoint-history"},
+    "checkpoint": {"const": "CKPT-2"},
+    "revision_id": {"type": "string", "minLength": 1},
+    "archived_at": {"type": "string", "minLength": 1},
+    "archived_by": {"type": "string", "minLength": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "source_checkpoint_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "source_deck_sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+    "review_bundle_sha256": {"type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$"},
+    "delivery_manifest_sha256": {"type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$"},
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "size_bytes"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-fA-F0-9]{64}$"},
+          "size_bytes": {"type": "integer", "minimum": 0}
+        }
+      }
+    }
+  }
+}

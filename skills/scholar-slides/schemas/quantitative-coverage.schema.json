@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scholar-slides-quantitative-coverage.schema.json",
+  "title": "scholar-slides quantitative coverage",
+  "type": "object",
+  "required": ["schema_version", "kind", "requirements", "provenance"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "kind": {"const": "scholar-slides-quantitative-coverage"},
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "kind", "label", "display_text", "required", "source",
+          "coverage_tokens", "priority"
+        ],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["key_metric", "quantitative_result", "pairwise_audit_comparison", "scientific_result"]},
+          "label": {"type": "string", "minLength": 1},
+          "display_text": {"type": "string", "minLength": 1},
+          "required": {"const": true},
+          "source": {"type": "object"},
+          "audit_ref": {
+            "type": "object",
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          },
+          "coverage_tokens": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "priority": {"type": "integer"}
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["digest_sha256", "checkpoint", "checkpoint_sha256"],
+      "properties": {
+        "digest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "checkpoint": {"const": "CKPT-1"},
+        "checkpoint_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ckpt1_review_sha256": {"type": "string"},
+        "audits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# Copy to scholar-slides.yaml in a project directory, then use --config if needed.
+# Local paths must be relative; absolute local paths are rejected for portability.
+version: 1
+language: zh-CN
+deck_type: journal-club
+audience: reading-first
+# Explicit presentation constraints override the selected deck-type contract.
+# talk_time_minutes: 45
+# density: high
+theme: academic
+slide_count: 12
+checkpoint:
+  require_human_confirmation: true
+export:
+  formats: [html, pdf, pptx, notes]
