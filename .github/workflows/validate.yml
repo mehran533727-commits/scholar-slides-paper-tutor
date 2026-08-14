@@ -1,0 +1,65 @@
+name: Validate skill bundle
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Windows package and runtime validation
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: skills/scholar-slides/runtime/requirements-runtime.txt
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: skills/scholar-slides/runtime/package-lock.json
+
+      - name: Run unit tests
+        shell: pwsh
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest discover -s tests -v
+
+      - name: Validate package structure and scripts
+        shell: pwsh
+        run: ./scripts/verify-package.ps1
+
+      - name: Rebuild Python runtime
+        shell: pwsh
+        run: |
+          python -m venv skills/scholar-slides/runtime/.venv
+          & skills/scholar-slides/runtime/.venv/Scripts/python.exe -m pip install --disable-pip-version-check -r skills/scholar-slides/runtime/requirements-runtime.txt
+          & skills/scholar-slides/runtime/.venv/Scripts/python.exe -c "import fitz, PIL, requests, matplotlib, numpy, pptx, jsonschema"
+
+      - name: Rebuild Node.js runtime
+        shell: pwsh
+        working-directory: skills/scholar-slides/runtime
+        run: npm ci
+
+      - name: Smoke-test Scholar-Slides CLI
+        shell: pwsh
+        run: |
+          $version = (& ./skills/scholar-slides/bin/scholar-slides.ps1 --version | Out-String).Trim()
+          if ($version -ne "0.3.0") {
+            throw "Expected Scholar-Slides 0.3.0, got '$version'."
+          }
